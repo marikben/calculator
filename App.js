@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import { FlatList, Text, View, Button, TextInput} from 'react-native';
+import React, {useState, useRef} from 'react';
+import { StyleSheet, FlatList, Text, View, Button, TextInput} from 'react-native';
 
 export default function App() {
   const [num1, setNum1] = useState('');
@@ -7,33 +7,72 @@ export default function App() {
   const [result, setResult] = useState('');
   const [data, setData] = useState([]);
  
-  const buttonPressed = () =>{
-    //for some reason buttonPressed2 didn't need the parseInt but this one did (to do the math.function)
-    setResult(parseInt(num1)+parseInt(num2))
-    setData([...data, {key:num1+'+'+num2+'='+(parseInt(num1)+parseInt(num2))}]);
-  }
-  const buttonPressed2 = () =>{
-  setResult(num1-num2)
-  setData([...data, {key:num1+'-'+num2+'='+(num1-num2)}]);
+  const initialFocus = useRef(null);
+  const calculation = operator => {
+    const [number1, number2] = [Number(num1), Number(num2)];
+    if (isNaN(number1) || isNaN(number2)){
+      setResult(0);
+    } else {
+      let result = 0;
+      switch (operator){
+        case '+':
+        result = number1 + number2;
+        break;
+        case '-':
+          result = number1 - number2;
+          break;
+      }
+      setResult(result);
+      const text = `${number1} ${operator} ${number2} = ${result}`;
+      setData([...data, { value: text }])
+      
+    }
+    setNum1('');
+    setNum2('');
+    initialFocus.current.focus();
 }
 
   return (
     <View>
       <Text>Result: {result}</Text>
       <TextInput 
-      style={{width:200, borderColor:'gray', borderWidth:1}}
-      keyboardType = 'numeric'
-      onChangeText={num1 => setNum1(num1)} value={num1}/>
+      style={styles.input}
+      keyboardType = {'numeric'}
+      onChangeText={text => setNum1(text)} 
+      value={num1}/>
       <TextInput 
-      style={{width:200, borderColor:'gray', borderWidth:1}}
+      style={styles.input}
       keyboardType = 'numeric'
-      onChangeText={num2 => setNum2(num2)}value={num2}/>
-      <Button onPress={buttonPressed} title="+"/>
-      <Button onPress={buttonPressed2} title="-"/>
+      onChangeText={text => setNum2(text)}
+      value={num2}/>
+      <View style={styles.buttons}>
+      <Button buttonStyle={styles.button} onPress={() => calculation('+')} title="+"/>
+      <Button buttonStyle={styles.button} onPress={() => calculation('-')} title="-"/>
+      </View>
       <Text>History</Text>
       <FlatList 
       data={data}
-      renderItem={({item}) =><Text>{item.key}</ Text>}/>
+      renderItem={({item}) =>
+        <Text>{item.value}</ Text>}/>
     </View>
   );
 }
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 30
+  },
+  input: {
+    borderColor: 'grey',
+    borderWidth: 1,
+    padding: 5,
+    margin: 5,
+    width: '50%'
+  },
+  buttons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  }
+})
