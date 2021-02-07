@@ -46,9 +46,9 @@ export default function HomeScreen( { navigation }) {
       onChangeText={text => setNum2(text)}
       value={num2}/>
       <View style={styles.buttons}>
-        <Button buttonStyle={styles.button} onPress={() => calculation('+')} title="+"/>
-        <Button buttonStyle={styles.button} onPress={() => calculation('-')} title="-"/>
-        <Button buttonStyle={styles.button} title="History" onPress={() => navigation.navigate('History', {data}, setResult(''))}/> 
+        <Button onPress={() => calculation('+')} title="+"/>
+        <Button onPress={() => calculation('-')} title="-"/>
+        <Button title="History" onPress={() => navigation.navigate('History', {data}, setResult(''))}/> 
         </View >
         </View >
     );
